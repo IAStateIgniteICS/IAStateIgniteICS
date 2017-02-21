@@ -51,7 +51,7 @@ function cloneTemplate() {
 
 // get hooks from the global context
 function createHookable(defaults) {
-	console.log("Overridable values");
+	var helpMsg = [];
 
 	// inherit from the default values then attach the overrides
 	var overrides = Object.create(defaults);
@@ -82,7 +82,17 @@ function createHookable(defaults) {
 		}
 
 		// give type and arguments if its a function
-		console.log(key + " [type: " + typeof defaults[key] + "] " + fnDefs);
+		helpMsg.push(key + " [type: " + typeof defaults[key] + "] " + fnDefs);
+	});
+
+	// use setTimeout so the "Navigated to ..." message does not end up in the
+	// middle of the help message
+	setTimeout(function() {
+		console.log("%cOverridable values", "font-size: 1.7em;");
+
+		helpMsg.forEach(function(msg) {
+			console.log(msg);
+		});
 	});
 
 	return overrides;
