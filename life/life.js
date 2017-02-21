@@ -110,10 +110,15 @@ function allDead() {
 // set a rect to alive
 function alive(x, y) {
 	// we need whole numbers
-	x = Math.round(x);
-	y = Math.round(y);
+	x = Math.round(x - 1);
+	y = Math.round(y - 1);
 
-	template[y - 1][x - 1] = true;
+	if(x < 0 || y < 0 || x > template[0].length || y > template.length) {
+		console.warn("alive(" + x + ", " + y + ") is off the grid");
+		return;
+	}
+
+	template[y][x] = true;
 }
 
 // run a single frame
