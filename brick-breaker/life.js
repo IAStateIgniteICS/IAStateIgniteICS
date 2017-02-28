@@ -27,3 +27,14 @@ if(typeof draw == "function") {
 
 	frame();
 }
+
+document.body.addEventListener("keydown", function(e) {
+	// left arrow press
+	if(e.keyCode == 37 && typeof left == "function") {
+		left();
+	}
+	// right arrow press
+	if(e.keyCode == 39 && typeof right == "function") {
+		right();
+	}
+});
