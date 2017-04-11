@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+				<html>
+					<head>
+						<title>Life</title>
+						<style>
+							canvas {
+								border: 1px solid;
+				                cursor: none;
+							}
+						</style>
+					</head>
+					<body>
+						<canvas></canvas>
+						<script>
+							// define our constant values here so we can change them easily
+var PADDLE_WIDTH = 100;
+var PADDLE_HEIGHT = 10;
+var CANVAS_HEIGHT = 450;
+var CANVAS_WIDTH = 450;
+var BALL_HEIGHT = 10;
+var BALL_WIDTH = 10;
+var life = 5
+var wait = false;
+// an object to represent the paddle
+var paddle = {
+  x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+  y: CANVAS_HEIGHT - PADDLE_HEIGHT
+};
+var ball = {
+  x: 60,
+  y: 200,
+  xVelocity: 5,
+  yVelocity: 5
+  
+};
+ball.xVelocity = +prompt("xVelocity of ball?");
+ball.yVelocity = +prompt("yVelocity of ball?");
+var blocks = [];
+function createBlock (x,y,damage, color){
+   blocks.push ({ x: x,
+   y:y,
+   damage: damage,
+   color: color})
+}
+// draw a frame
+function draw() {
+  rect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT, "black");
+  rect(ball.x, ball.y, BALL_HEIGHT, BALL_WIDTH, "black");
+  for (var i = 0; i < blocks.length; i++){
+    if (blocks[i].damage > 0){
+      var color = "violet"
+      if (blocks[i].damage === 7){
+        color = "red"
+      }
+      if (blocks[i].damage === 6){
+        color = "orange"
+      }
+      if (blocks[i].damage === 5){
+        color = "yellow"
+      }
+      if (blocks[i].damage === 4){
+        color = "green"
+      }
+      if (blocks[i].damage === 3){
+        color = "blue"
+      }
+      if (blocks[i].damage === 2){
+        color = "indigo"
+      }
+    rect(blocks[i].x, blocks[i].y, PADDLE_WIDTH, PADDLE_HEIGHT, color);
+    blockCollision(blocks[i]);
+}
+              
+                                         }
+  
+  ball.x += ball.xVelocity;
+  ball.y += ball.yVelocity;
+  isColliding();
+  text(400, 400, life);
+}
+function isColliding () {
+  if (ball.x >= CANVAS_WIDTH - 10){
+    ball.xVelocity *= -1;
+  }
+  if (ball.y >= CANVAS_WIDTH - 10){
+    ball.y = 200;
+    ball.x = 100;
+    life --;
+    wait = true;
+    console.log("You have " + life + " life remaining");
+  }
+  if (ball.x <= 0){
+    ball.xVelocity *= -1;
+  }
+  if (ball.y <= 0){
+    ball.yVelocity *= -1;
+    
+  }
+  if (ball.x <= paddle.x + 110 && ball.x - 10 >= paddle.x + 10 && ball.y >= paddle.y - 10 ) {
+      ball.yVelocity *= -1;
+    }
+}
+function blockCollision (block){
+  if (block.damage > 0 && ball.x <= block.x + 120 && ball.x >= block.x && ball.y >= block.y && ball.y <= block.y + 10 ) {
+      ball.yVelocity *= -1;
+      block.damage --;
+      
+    }
+}
+
+// the left arrow key was clicked
+function left() {
+  paddle.x -= 20; // paddle.x = paddle.x - 5;
+  
+  // don't let it go off the screen
+  if(paddle.x < 0) {
+    paddle.x = 0;
+  }
+}
+
+// the right arrow key was clicked
+function right() {
+  paddle.x += 20; // paddle.x = paddle.x + 5;
+  
+  // don't let it go off the screen
+  if(paddle.x > canvas.width - PADDLE_WIDTH) {
+    paddle.x = canvas.width - PADDLE_WIDTH;
+  }
+}
+
+createBlock(25,100,1);
+createBlock(25,90,2);
+createBlock(25,80,3);
+createBlock(25,70,4);
+createBlock(25,60,5);
+createBlock(25,50,6);
+createBlock(25,40,7);
+createBlock(125,100,1);
+createBlock(125,90,2);
+createBlock(125,80,3);
+createBlock(125,70,4);
+createBlock(125,60,5);
+createBlock(125,50,6);
+createBlock(125,40,7);
+createBlock(225,100,1);
+createBlock(225,90,2);
+createBlock(225,80,3);
+createBlock(225,70,4);
+createBlock(225,60,5);
+createBlock(225,50,6);
+createBlock(225,40,7);
+createBlock(325,100,1);
+createBlock(325,90,2);
+createBlock(325,80,3);
+createBlock(325,70,4);
+createBlock(325,60,5);
+createBlock(325,50,6);
+createBlock(325,40,7); 
+function text(x, y, message){
+  ctx.beginPath();
+  ctx.fillStyle = "black";
+  ctx.font = "48pt monospace"
+  ctx.fillText(message, x, y);
+  ctx.fill();
+}
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+// get the canvas and drawing context
+var canvas = document.querySelector("canvas");
+var ctx = canvas.getContext("2d");
+
+// size the canvas
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+
+// draw a rectange
+function rect(x, y, width, height, color) {
+	// start a new stroke so when we fill in the rectange everything
+	// else we have drawn already will not be redrawn
+	ctx.beginPath();
+
+	// add a rectange to the path
+	ctx.rect(x, y, width, height);
+
+	// set the color for the rectange
+	ctx.fillStyle = color;
+
+	// draw the rectange
+	ctx.fill();
+}
+
+function frame() {
+  // clear the screen
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (life <= 0){
+    text(50, 250, "You lose");
+    return;
+  } else if (blocks.every(function (block){
+    return block.damage === 0;
+  })) { 
+    text(50, 250, "You win");
+    return;
+    
+  }
+  // draw a frame
+  draw();
+
+  // wait for the next one
+  if (wait === true) {
+    wait = false;
+    setTimeout(frame, 3000);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw();
+} else {
+  requestAnimationFrame(frame);
+  //setTimeout(frame, 30/1000);
+}
+}
+
+// draw the first frame
+frame();
+
+document.body.addEventListener("mousemove", function(e) {
+	paddle.x = e.clientX - PADDLE_WIDTH/2;
+
+	
+});
+//////
+						</script>
+					</body>
+				</html>

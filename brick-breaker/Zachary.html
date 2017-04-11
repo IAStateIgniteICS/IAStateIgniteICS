@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+				<html>
+					<head>
+						<title>Life</title>
+						<style>
+							canvas {
+								border: 1px solid;
+				                cursor: none;
+							}
+						</style>
+					</head>
+					<body>
+						<canvas></canvas>
+						<script>
+							// define our constant values here so we can change them easily 
+var PADDLE_WIDTH = 100;
+var PADDLE_HEIGHT = 10;
+var CANVAS_HEIGHT = 450;
+var CANVAS_WIDTH = 450;
+var blocks = []
+var lives = 5
+var died = false
+// an object to represent the paddle
+var paddle = {
+  x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+  y: CANVAS_HEIGHT - PADDLE_HEIGHT
+};
+var ball = {
+  x: 100, y: 100, xSpeed: 5, ySpeed: 5
+};
+function createBlock(x,y){
+  blocks.push({
+    x,y,damage:1
+  })
+  
+ 
+}
+for(var I = 0; I < CANVAS_WIDTH; I += PADDLE_WIDTH){
+  for(var Y = 30; Y < 60; Y += PADDLE_HEIGHT){
+    createBlock(I, Y)
+  }
+}
+// draw a frame
+function draw() {
+  rect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT, "blue");
+rect(ball.x, ball.y, 10, 10, "red"); 
+  ball.x += ball.xSpeed;
+  ball.y += ball.ySpeed;
+  colliding();
+  for(var block of blocks){
+    if((block.damage < 3)){
+    var color = "green";
+      if(block.damage == 2){
+        color = "yellow";   
+      } 
+  if(block.damage == 3){
+    color = "red";
+  }
+    rect(block.x, block.y, PADDLE_WIDTH, PADDLE_HEIGHT, color)
+    blockColliding(block);
+    }
+  }
+    
+}
+function colliding() {
+  if(ball.x > CANVAS_WIDTH-10){
+    ball.xSpeed*=-1;
+  }
+  if(ball.y > CANVAS_HEIGHT-10){
+    lives -= 1
+    died = true
+    ball.y = 100;
+    ball.x = 100;
+    ball.yVelocity = 5;
+    ball.xVelocity = 5;
+  }
+  if(ball.x < 0){
+    ball.xSpeed*=-1;
+  }
+  if(ball.y < 0){
+    ball.ySpeed*=-1;
+  }
+  if(ball.y+10 == paddle.y && ball.x > paddle.x && ball.x < paddle.x+ PADDLE_WIDTH){
+    ball.ySpeed*=-1;
+  }
+  
+ 
+}
+function blockColliding(block) {
+  if((ball.y-10 == block.y || ball.y+10 == block.y) && ball.x > block.x && ball.x < block.x+ PADDLE_WIDTH){
+    ball.ySpeed*=-1;
+    block.damage++
+  }
+  if((ball.x+10 == block.x || ball.x == block.x+PADDLE_WIDTH) && ball.y > block.y && ball.y < block.y+ PADDLE_HEIGHT){
+    ball.xSpeed*=-1;
+    block.damage++
+  }
+  
+   
+
+}
+function writeText(msg,x,y) {
+  ctx.beginPath()
+  ctx.fillStyle="black"
+  ctx.font="46pt monospace"
+  ctx.fillText(msg,x,y)
+  ctx.fill()
+}
+// the left arrow key was clicked
+function left() {
+  paddle.x -= 10; // paddle.x = paddle.x - 5;
+  
+  // don't let it go off the screen
+  if(paddle.x < 0) {
+    paddle.x = 0;
+  }
+}
+
+// the right arrow key was clicked
+function right() {
+  paddle.x += 10; // paddle.x = paddle.x + 5;
+  
+  // don't let it go off the screen
+  if(paddle.x > canvas.width - PADDLE_WIDTH) {
+    paddle.x = canvas.width - PADDLE_WIDTH;
+  }
+}
+
+
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+// get the canvas and drawing context
+var canvas = document.querySelector("canvas");
+var ctx = canvas.getContext("2d");
+
+// size the canvas
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+
+// draw a rectange
+function rect(x, y, width, height, color) {
+	// start a new stroke so when we fill in the rectange everything
+	// else we have drawn already will not be redrawn
+	ctx.beginPath();
+
+	// add a rectange to the path
+	ctx.rect(x, y, width, height);
+
+	// set the color for the rectange
+	ctx.fillStyle = color;
+
+	// draw the rectange
+	ctx.fill();
+}
+
+function frame() {
+  // clear the screen
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // draw a frame
+  draw();
+if (lives === 0){
+  writeText("Game Over",75,150)
+}
+  else if (blocks.every(function(block){
+    return block.damage >= 2
+  })){
+   writeText("You Won",75,150) 
+   draw()
+  }
+  else if (died){
+    setTimeout(frame, 3000)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw();
+    died = false
+  }
+else{ 
+  
+  // wait for the next one
+  requestAnimationFrame(frame);
+}
+}
+
+// draw the first frame
+frame();
+
+document.body.addEventListener("mousemove", function(e) {
+	paddle.x = e.clientX - PADDLE_WIDTH/2
+    
+   
+});
+						</script>
+					</body>
+				</html>

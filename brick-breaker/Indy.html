@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2017 by procodeing (http://jsbin.com/tefesek/30/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+	<head>
+		<title>Life</title>
+		<style>
+			canvas {
+				border: 1px solid;
+			}
+		</style>
+	<style id="jsbin-css">
+canvas{
+  border-radius:25px;
+  border-style:inset;
+  border-width:2px;
+  box-shadow:0px 5px 1px 5px blue;
+  transform: skewX(.9deg)
+}
+</style>
+</head>
+	<body>
+		<canvas></canvas>
+		<script src="edit_me.js"></script>
+      <p>ball spood:</p><b id="spood"></b>
+	<script id="jsbin-javascript">
+// define our constant values here so we can change them easily
+TIME = 0; 
+var PADDLE_WIDTH = 100;
+var PADDLE_HEIGHT = 10;
+var CANVAS_HEIGHT = 450;
+var CANVAS_WIDTH = 450;
+var SPEEDMULT = 8;
+var BASEMULT = SPEEDMULT;
+var ACCMULT = 2;
+var ANGLEAMP = 2;
+var TRIPDELAY = 1;
+var WIGGLE_START = 5;
+spood.innerHTML=SPEEDMULT;
+
+// an object to represent the paddle
+var paddle = {
+  x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+  y: CANVAS_HEIGHT - PADDLE_HEIGHT
+};
+var skewamount = 0;
+
+// draw a frame
+function draw() {
+  
+  TIME++;
+  rect(0, 0, canvas.width, canvas.height,"hsla("+(SPEEDMULT*100)%360+",100%,50%,"+1/(SPEEDMULT/2)+")");
+  rect(paddle.x, paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT, "hsl("+(SPEEDMULT*100 + 180)%360+",100%,50%)");
+  //rect(paddle.x + PADDLE_WIDTH/2, paddle.y, 4, 4, "cyan");
+  ball.x += ball.xspeed+((Math.sin(Math.random()*TIME)*WIGGLE)-(0.5*WIGGLE));
+  ball.y += ball.yspeed+((Math.cos(Math.random()*TIME)*WIGGLE)-(0.5*WIGGLE));
+  //sets x-speed
+  if(ball.x > CANVAS_WIDTH-(ball.width)){ball.xspeed=-((Math.random()*(SPEEDMULT*ANGLEAMP)));}else if(ball.x < 0){ball.xspeed=((Math.random()*(SPEEDMULT*ANGLEAMP)));}
+  if(ball.y < (0+ball.height)){ball.yspeed = SPEEDMULT;}
+  //if(ball.y > (CANVAS_HEIGHT-ball.height)){ball.yspeed = -SPEEDMULT;}
+ //paddle.x=ball.x -PADDLE_WIDTH/2; /*hacks*/
+  if(
+    (ball.y>=(CANVAS_HEIGHT-PADDLE_HEIGHT -ball.height))&&
+    (ball.x<=paddle.x+PADDLE_WIDTH)&& /*clips paddle's right*/
+    (ball.x>=paddle.x) /*clips paddles left*/
+    ){SPEEDMULT+= ACCMULT;ball.yspeed = -SPEEDMULT;ball.xspeed = ((Math.random()*(SPEEDMULT*ANGLEAMP))-((SPEEDMULT*ANGLEAMP)/2));spood.innerHTML=Math.floor(SPEEDMULT);skewamount++;
+      canvas.style.transform="rotate3d(1,0,0,"+Math.sin(SPEEDMULT)*(SPEEDMULT/TRIPDELAY)+"deg)"
+      ;}
+  else if(ball.y>CANVAS_HEIGHT){console.log("score:"+SPEEDMULT);rect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT,"black");ball.x=CANVAS_WIDTH/2;ball.y=CANVAS_HEIGHT/2;SPEEDMULT=BASEMULT;spood.innerHTML=SPEEDMULT;ball.xspeed=0;ball.yspeed=SPEEDMULT;canvas.style.transform="rotate3d(1,1,1,0deg)";WIGGLE=WIGGLE_START;}
+  rect(ball.x,ball.y,ball.width,ball.height,"hsl("+(SPEEDMULT*100 + 180)%360+",100%,50%)");
+  //paddle.x=ball.x -PADDLE_WIDTH/2 + ball.width/2; /*AI*/
+}
+/*
+// the left arrow key was clicked
+function left() {
+  paddle.x -= 10; // paddle.x = paddle.x - 5;
+  
+  // don't let it go off the screen
+  if(paddle.x < 0) {
+    paddle.x = 0;
+  }
+}
+
+// the right arrow key was clicked
+function right() {
+  paddle.x += 10; // paddle.x = paddle.x + 5;
+  
+  // don't let it go off the screen
+  if(paddle.x > canvas.width - PADDLE_WIDTH) {
+    paddle.x = canvas.width - PADDLE_WIDTH;
+  }
+}*/
+function move(e){var re=canvas.getBoundingClientRect();paddle.x = e.clientX-re.left - PADDLE_WIDTH/2-12;
+               if(paddle.x > canvas.width - PADDLE_WIDTH) {
+    paddle.x = canvas.width - PADDLE_WIDTH;
+  }if(paddle.x < 0) {
+    paddle.x = 0;
+  }
+              }
+var ball = {
+  width:10,
+  height:10,
+  x:CANVAS_WIDTH/2,
+  y:CANVAS_HEIGHT/2,
+  xspeed: 0,
+  yspeed: SPEEDMULT
+};
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+// get the canvas and drawing context
+var canvas = document.querySelector("canvas");
+var ctx = canvas.getContext("2d");
+
+// size the canvas
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+
+// draw a rectange
+function rect(x, y, width, height, color) {
+	// start a new stroke so when we fill in the rectange everything
+	// else we have drawn already will not be redrawn
+	ctx.beginPath();
+
+	// add a rectange to the path
+	ctx.rect(x, y, width, height);
+
+	// set the color for the rectange
+	ctx.fillStyle = color;
+
+	// draw the rectange
+	ctx.fill();
+}
+
+function frame() {
+  // clear the screen
+  
+
+  // draw a frame
+  
+  draw();
+
+  // wait for the next one
+  requestAnimationFrame(frame);
+}
+
+// draw the first frame
+var WIGGLE=WIGGLE_START
+frame();
+
+/*document.body.addEventListener("keydown", function(e) {
+	// left arrow press
+	if(e.keyCode == 37) {
+		left();
+	}
+	// right arrow press
+	else if(e.keyCode == 39) {
+		right();
+	}
+});*/
+document.body.addEventListener("mousemove", function(e) {
+	var r = e;
+    move(e);
+});
+</script>
+</body>
+</html>
